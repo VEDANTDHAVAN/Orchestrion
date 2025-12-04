@@ -13,6 +13,8 @@ import { type Node, type Edge, applyNodeChanges, applyEdgeChanges, addEdge,
 import { useCallback, useState } from "react";
 import { nodeComponents } from "@/config/node-components";
 import { AddNodeButton } from "./add-node-button";
+import { useSetAtom } from "jotai";
+import { EditorAtom } from "../store/atoms";
 
 export const EditorLoading = () => {
  return <LoadingView message="Loading Editor..." />
@@ -23,6 +25,8 @@ export const EditorError = () => {
 }
 
 export const Editor = ({ workflowId }: { workflowId: string }) => {
+  const setEditor = useSetAtom(EditorAtom);
+ 
   const { data: workflow } = useSuspenseWorkflow(workflowId);
   const [nodes, setNodes] = useState<Node[]>(workflow.nodes);
   const [edges, setEdges] = useState<Edge[]>(workflow.edges);
@@ -44,7 +48,8 @@ export const Editor = ({ workflowId }: { workflowId: string }) => {
     <div className="size-full">
      <ReactFlow nodes={nodes} edges={edges} onConnect={onConnect}
       onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} 
-      fitView nodeTypes={nodeComponents}
+      fitView nodeTypes={nodeComponents} onInit={setEditor}
+      snapGrid={[10, 10]} snapToGrid panOnScroll panOnDrag={false} selectionOnDrag
      >
       <Background /> <Controls /> <MiniMap />
       <Panel position="top-right">
